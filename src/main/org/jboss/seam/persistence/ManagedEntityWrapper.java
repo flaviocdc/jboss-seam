@@ -15,6 +15,7 @@ import org.jboss.seam.Component;
 import org.jboss.seam.Seam;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.contexts.Contexts;
+import org.jboss.seam.contexts.ServerConversationContext;
 import org.jboss.seam.core.Manager;
 import org.jboss.seam.log.LogProvider;
 import org.jboss.seam.log.Logging;
@@ -38,7 +39,16 @@ public class ManagedEntityWrapper
          log.trace("No touched persistence contexts. Therefore, there are no entities in this conversation whose identities need to be preserved.");
          return;
       }
-      
+     
+      // Fix for JBSEAM-4375 - temporarily promote the conversation to long-running to 
+      // avoid flushing (and clearing) the parent conversation
+      Manager manager = Manager.instance();
+      boolean temporarilyPromote = manager.isNestedConversation() && !manager.isLongRunningConversation() ;
+      if (temporarilyPromote) 
+      {
+        manager.setLongRunningConversation(true) ;
+      }
+
       String oldCid = switchToConversationContextOfComponent(component);
       Class beanClass = target.getClass();
       for (; beanClass!=Object.class; beanClass=beanClass.getSuperclass())
@@ -81,6 +91,12 @@ public class ManagedEntityWrapper
          }
       }
       restorePreviousConversationContextIfNecessary(oldCid);
+
+      // Second part of fix for JBSEAM-4375 - restore the conversation back to its original state if it was promoted...
+      if (temporarilyPromote) 
+      {
+         manager.setLongRunningConversation(false) ;
+      }
    }
 
    public void deserialize(Object controllerBean, Component component) throws Exception
@@ -234,6 +250,12 @@ public class ManagedEntityWrapper
          {
             Contexts.getConversationContext().flush();
             Manager.instance().switchConversation(residentCid, false);
+
+            if (Contexts.getConversationContext() instanceof ServerConversationContext)
+            {
+                  // force the child conversation to re-activate after flush
+                  ((ServerConversationContext) Contexts.getConversationContext()).unflush(); 
+            }         
             return currentCid;
          }
       }
