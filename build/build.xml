@@ -16,6 +16,10 @@
 	<!-- e.g ant -Drepository.username=<your_username> -Drepository.password=<your_password> stageReleaseSeam --> 
 	<artifact:remoteRepository id="jboss-releases-repository" url="https://repository.jboss.org/nexus/service/local/staging/deploy/maven2">
 		<authentication username="${repository.username}" password="${repository.password}" />
+  </artifact:remoteRepository>
+
+  <artifact:remoteRepository id="gnosys-releases-repository" url="http://fauno.nce.ufrj.br/nexus/content/repositories/releases">
+		<authentication username="${repository.username}" password="${repository.password}" />
 	</artifact:remoteRepository>
 	
 	<target name="deployLocal">
@@ -86,6 +90,24 @@
 		<!-- <deployExample name="dvdstore" path="${seam.dir}/examples/dvdstore" repositoryId="jboss-releases-repository"/> -->
 		<!-- macro for JBoss AS 6 example build -->
 		<deployExampleJboss6 name="dvdstore" path="${seam.dir}/examples/dvdstore" repositoryId="jboss-releases-repository"/>
+	</target>
+  
+  <target name="releaseGnosysSeam" description="Deploy Seam and JBoss EL to Gnosys Nexus Repo" depends="initpoms">
+		<deploy pom="${root.pom}" repositoryId="gnosys-releases-repository"/>
+		<deploy pom="${parent.pom}" repositoryId="gnosys-releases-repository" />
+		<deployWithSources pom="${core.pom}" jar="${lib.dir}/jboss-seam.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-sources.jar" />
+		<deployWithSources pom="${debug.pom}" jar="${lib.dir}/jboss-seam-debug.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-debug-sources.jar"/>
+		<deployWithSources pom="${gen.pom}" jar="${lib.dir}/gen/jboss-seam-gen.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/gen/src/jboss-seam-gen-sources.jar"/>
+		<deployWithSources pom="${ioc.pom}" jar="${lib.dir}/jboss-seam-ioc.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-ioc-sources.jar"/>
+		<deployWithSources pom="${mail.pom}" jar="${lib.dir}/jboss-seam-mail.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-mail-sources.jar"/>
+		<deployWithSources pom="${pdf.pom}" jar="${lib.dir}/jboss-seam-pdf.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-pdf-sources.jar"/>
+		<deployWithSources pom="${excel.pom}" jar="${lib.dir}/jboss-seam-excel.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-excel-sources.jar"/>
+		<deployWithSources pom="${rss.pom}" jar="${lib.dir}/jboss-seam-rss.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-rss-sources.jar"/>
+		<deployWithSources pom="${remoting.pom}" jar="${lib.dir}/jboss-seam-remoting.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-remoting-sources.jar"/>
+		<deployWithSources pom="${ui.pom}" jar="${lib.dir}/jboss-seam-ui.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-ui-sources.jar"/>
+		<deployWithSources pom="${jul.pom}" jar="${lib.dir}/interop/jboss-seam-jul.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/interop/src/jboss-seam-jul-sources.jar"/>
+		<deployWithSources pom="${resteasy.pom}" jar="${lib.dir}/jboss-seam-resteasy.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-resteasy-sources.jar"/>
+	  <deployWithSources pom="${wicket.pom}" jar="${lib.dir}/jboss-seam-wicket.jar" repositoryId="gnosys-releases-repository" srcjar="${lib.dir}/src/jboss-seam-wicket-sources.jar"/>
 	</target>
 	
 	<target name="deployLocalPom">
