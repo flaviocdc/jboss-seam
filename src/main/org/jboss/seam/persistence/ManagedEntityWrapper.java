@@ -269,6 +269,10 @@ public class ManagedEntityWrapper
       {
          Contexts.getConversationContext().flush();
          Manager.instance().switchConversation(oldCid, false);
+         if (Contexts.getConversationContext() instanceof ServerConversationContext)
+         {
+           ((ServerConversationContext) Contexts.getConversationContext()).unflush();
+         }
       }
    }
    
